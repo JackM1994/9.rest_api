@@ -196,10 +196,15 @@ router.put('/courses/:id', [
     } else{
         const user = req.currentUser;
         const course = await Courses.findByPk(req.params.id);
-        const users = req.body
+        const newCourse ={
+            title: req.body.title,
+            description: req.body.description,
+            estimatedTime: req.body.estimatedTime,
+            materialsNeeded: req.body.materialsNeeded
+        }
         //Only let the user update their course
-        if(user.id === course.userId){
-            await Courses.update(users);
+        if(user.id == course.userId){
+            await course.update(newCourse);
             res.status(204).end();
 
         }else{
@@ -210,4 +215,34 @@ router.put('/courses/:id', [
    
 }));
 
+//DELETE /api/courses/:id 204 -
+// Deletes a course and returns no content
+router.delete('/courses/:id',[
+    check('title')
+        .exists( { checkNull: true, checkFalsy: true } )
+        .withMessage('Please provide a value for "title"'),
+    check('description')
+        .exists( {checkNull: true, checkFalsy: true} )
+        .withMessage('Please provide a value for "description"'),
+    check('userId')
+        .exists( {checkNull: true, checkFalsy: true} )
+        .withMessage('Please provide a value for "userId"')
+
+], authenticationUser, asyncHandler(async(req,res, next) =>{
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()){
+        const errorMessages = errors.array().map(error => error.msg);
+        res.status(400).json({ errors: errorMessages });
+    } else{
+        const course = await Courses.findByPk(req.params.id);
+        if(course){
+            await course.destroy(req.body);
+            res.status(204).end();
+        }
+        else{
+            res.status(403).json(({message: 'You cannot Delete this course'}));
+        }
+    }
+}));
 module.exports = router;
