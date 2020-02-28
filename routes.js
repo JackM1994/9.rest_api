@@ -217,7 +217,6 @@ router.put('/courses/:id', [
 
 //DELETE /api/courses/:id 204 -
 // Deletes a course and returns no content
-    } else{
 router.delete('/courses/:id', authenticationUser, asyncHandler(async(req,res, next) =>{
     
         const course = await Courses.findByPk(req.params.id);
