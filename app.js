@@ -5,6 +5,18 @@ const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const routes = require('./routes');
+const { sequelize } = require('./models');
+
+
+//connection for the database "fsjstd-restapi.db"
+(async () =>{
+  try{
+    await sequelize.authenticate();
+    console.log('Connection to the database was successful');
+  }catch(error){
+    console.log('Error connecting to the database: ', error);
+  }
+})();
 
 
 // variable to enable global error logging

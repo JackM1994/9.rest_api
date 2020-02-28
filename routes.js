@@ -217,24 +217,9 @@ router.put('/courses/:id', [
 
 //DELETE /api/courses/:id 204 -
 // Deletes a course and returns no content
-router.delete('/courses/:id',[
-    check('title')
-        .exists( { checkNull: true, checkFalsy: true } )
-        .withMessage('Please provide a value for "title"'),
-    check('description')
-        .exists( {checkNull: true, checkFalsy: true} )
-        .withMessage('Please provide a value for "description"'),
-    check('userId')
-        .exists( {checkNull: true, checkFalsy: true} )
-        .withMessage('Please provide a value for "userId"')
-
-], authenticationUser, asyncHandler(async(req,res, next) =>{
-    const errors = validationResult(req);
-
-    if(!errors.isEmpty()){
-        const errorMessages = errors.array().map(error => error.msg);
-        res.status(400).json({ errors: errorMessages });
     } else{
+router.delete('/courses/:id', authenticationUser, asyncHandler(async(req,res, next) =>{
+    
         const course = await Courses.findByPk(req.params.id);
         if(course){
             await course.destroy(req.body);
@@ -243,6 +228,5 @@ router.delete('/courses/:id',[
         else{
             res.status(403).json(({message: 'You cannot Delete this course'}));
         }
-    }
-}));
+    }));
 module.exports = router;
